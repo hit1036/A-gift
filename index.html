@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Ensure proper scaling on iOS devices -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Happy Birthday Princy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Canvas confetti for celebrations -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Tailwind configuration for specific animation utilities -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'float-slow': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* --- Core iOS Glass Theme --- */
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.10);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-blur: 30px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #000;
+            overflow: hidden;
+            color: white;
+            /* Prevent rubber-banding on iOS */
+            overscroll-behavior-y: none;
+            height: 100svh;
+        }
+
+        .animated-bg {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -2;
+            background: radial-gradient(circle at 50% 50%, #2a1f3d 0%, #000000 100%);
+        }
+
+        .orb {
+            position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.5; mix-blend-mode: screen;
+            animation: moveOrb 20s ease-in-out infinite alternate;
+        }
+        .orb-1 { top: -10%; left: -10%; width: 60vw; height: 60vw; background: #ff8a00; animation-delay: 0s; }
+        .orb-2 { bottom: -10%; right: -10%; width: 70vw; height: 70vw; background: #da1b60; animation-delay: -5s; }
+        .orb-3 { top: 40%; left: 30%; width: 50vw; height: 50vw; background: #ff00cc; animation-delay: -10s; }
+
+        @keyframes moveOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, 50px) scale(1.1); }
+        }
+
+        /* Glass Card Utility */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        /* Button Styles */
+        .ios-btn {
+            background: rgba(255, 255, 255, 0.9);
+            color: black;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+        .ios-btn:active { transform: scale(0.95); opacity: 0.8; }
+
+        /* Slide Transitions */
+        .slide {
+            position: fixed; inset: 0;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 1.5rem;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0; visibility: hidden; transform: scale(0.95) translateY(20px); filter: blur(10px);
+        }
+        .slide.active {
+            opacity: 1; visibility: visible; transform: scale(1) translateY(0); filter: blur(0px); z-index: 10;
+        }
+        .slide.prev { transform: translateX(-100%) scale(0.9) rotate(-5deg); opacity: 0; filter: blur(20px); }
+        .slide.next { transform: translateX(100%) scale(0.9) rotate(5deg); opacity: 0; filter: blur(20px); }
+
+    </style>
+</head>
+<body>
+
+    <!-- Background Layers -->
+    <div class="animated-bg"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <!-- ================= SLIDE 1: HOOK (GIFT BOX) ================= -->
+    <section id="slide1" class="slide active">
+        <div class="relative flex flex-col items-center">
+            <!-- Gift Button -->
+            <button id="gift-btn" onclick="openGift()" class="glass p-10 rounded-[50px] group transition-all duration-500 z-20">
+                <div class="text-8xl animate-float-slow filter drop-shadow-[0_0_30px_rgba(255,255,255,0.4)]">
+                    🎁
+                </div>
+                <p class="text-white/60 mt-4 text-sm tracking-widest uppercase font-medium group-active:opacity-0 transition-opacity">
+                    Tap to open
+                </p>
+            </button>
+
+            <!-- Hidden Welcome Message (Reveals on click) -->
+            <div id="welcome-msg" class="absolute top-full mt-8 glass rounded-3xl p-6 w-72 text-center opacity-0 translate-y-8 transition-all duration-700 pointer-events-none">
+                <h2 class="text-xl font-semibold text-white mb-2">Welcome Mam,</h2>
+                <p class="text-white/80 font-light">at your service...</p>
+                
+                <!-- Next Button 1 -->
+                <button onclick="nextSlide(2)" class="ios-btn mt-6 px-8 py-3 rounded-full w-full text-sm uppercase tracking-wider">
+                    Next
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= SLIDE 2: BEAUTIFUL REASON ================= -->
+    <section id="slide2" class="slide next">
+        <!-- SLIDE 2 BACKGROUND IMAGE (Image 4 - Blue sky) -->
+        <div class="absolute inset-0 z-0">
+            <img src="https://i.postimg.cc/gkJyQW8h/Screenshot-20251111-004721-Instagram.jpg" 
+                 class="w-full h-full object-cover opacity-50 scale-105 animate-[pulse-slow_8s_ease-in-out_infinite]" alt="Background">
+            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/40"></div>
+        </div>
+
+        <div class="glass relative z-10 p-8 rounded-[40px] max-w-md w-full mx-4 text-center border-white/10 backdrop-blur-xl">
+            <p class="text-lg md:text-2xl leading-relaxed font-light text-white/90 drop-shadow-lg">
+                "You’re a beautiful reason for the world to smile today. Hope your heart feels loved, your soul feels peaceful, and your day shines just like you do 💖"
+            </p>
+        </div>
+
+        <!-- Next Button 2 -->
+        <button onclick="nextSlide(3)" class="ios-btn relative z-10 mt-12 px-10 py-4 rounded-full text-sm uppercase tracking-wider shadow-xl">
+            Continue
+        </button>
+    </section>
+
+    <!-- ================= SLIDE 3: VOICE MESSAGE & MEMORIES ================= -->
+    <section id="slide3" class="slide next">
+        <div class="w-full max-w-md flex flex-col items-center space-y-8">
+            
+            <!-- MEMORY PHOTOS CONTAINER (IMAGES 2 & 3) -->
+            <div class="flex justify-center items-center relative w-full h-72">
+                <!-- PHOTO 2 (Yellow top) -->
+                <div class="glass p-1.5 rounded-3xl w-48 h-64 absolute left-4 rotate-[-8deg] hover:rotate-0 transition-transform duration-500 z-10">
+                    <img src="https://i.postimg.cc/GhytHgC0/Screenshot-20251021-181702-Instagram.jpg" 
+                         class="w-full h-full object-cover rounded-[20px]" alt="Memory 1">
+                </div>
+                <!-- PHOTO 3 (Pink top) -->
+                <div class="glass p-1.5 rounded-3xl w-48 h-64 absolute right-4 rotate-[6deg] hover:rotate-0 transition-transform duration-500 translate-y-8">
+                    <img src="https://i.postimg.cc/Pq4PdLkx/Screenshot-20251111-004649-Instagram.jpg" 
+                         class="w-full h-full object-cover rounded-[20px]" alt="Memory 2">
+                </div>
+            </div>
+
+            <!-- Audio Player Interface -->
+            <div class="glass w-full mx-4 p-6 rounded-[30px] flex flex-col items-center text-center space-y-5 z-20">
+                <h3 class="text-white/60 uppercase tracking-widest text-xs font-semibold">Voice Message</h3>
+                
+                <!-- Custom animated sound wave visualizer -->
+                <div id="sound-wave" class="flex items-center justify-center space-x-1.5 h-10 opacity-30 transition-opacity duration-300">
+                    <div class="w-1 h-full bg-pink-400 rounded-full animate-[pulse_1s_ease-in-out_infinite]"></div>
+                    <div class="w-1 h-3/4 bg-pink-400 rounded-full animate-[pulse_1.2s_ease-in-out_infinite] delay-100"></div>
+                    <div class="w-1 h-full bg-pink-400 rounded-full animate-[pulse_0.8s_ease-in-out_infinite] delay-200"></div>
+                    <div class="w-1 h-1/2 bg-pink-400 rounded-full animate-[pulse_1.5s_ease-in-out_infinite] delay-300"></div>
+                    <div class="w-1 h-full bg-pink-400 rounded-full animate-[pulse_1s_ease-in-out_infinite] delay-400"></div>
+                </div>
+
+                <button id="play-btn" onclick="playVoiceMessage()" class="ios-btn px-8 py-3 rounded-full text-sm font-semibold flex items-center space-x-3">
+                    <span id="play-icon" class="text-lg">▶</span>
+                    <span id="play-text">Play Message</span>
+                </button>
+            </div>
+        </div>
+
+         <!-- Next Button 3 -->
+         <button onclick="nextSlide(4)" class="ios-btn relative z-10 mt-8 px-10 py-4 rounded-full text-sm uppercase tracking-wider shadow-xl">
+            Next
+        </button>
+    </section>
+
+    <!-- ================= SLIDE 4: FINAL WISH (IMAGE 1) ================= -->
+    <section id="slide4" class="slide next">
+        <div class="glass p-1.5 rounded-[50px] w-full max-w-md overflow-hidden shadow-2xl relative mx-4">
+            <!-- HERO IMAGE (IMAGE 1 - White dress) -->
+            <div class="relative h-[50vh] w-full rounded-[45px] overflow-hidden">
+                <img src="https://i.postimg.cc/jdHWM3kH/Screenshot-20251019-193446-Instagram.jpg" 
+                     class="w-full h-full object-cover" alt="Princy">
+                <!-- Gradient Overlay for text readability -->
+                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
+            </div>
+
+            <div class="p-8 text-center relative -mt-24 z-10">
+                <h1 class="text-3xl md:text-4xl font-bold text-white mb-6 drop-shadow-xl">
+                    Happy Birthday Princy!
+                </h1>
+                <div class="glass p-6 rounded-3xl !bg-black/30 !border-white/10 backdrop-blur-xl">
+                    <p class="text-white/90 font-light leading-relaxed text-sm md:text-base">
+                        "I don't know your likes and dislikes. So, this a gift from my side. And I'm waiting for your reaction. At last, Happy Birthday Princy, from deep of my heart."
+                    </p>
+                </div>
+                <div class="mt-8 text-3xl animate-pulse filter drop-shadow-lg">
+                    ❤️ 🎉 ✨
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        let currentSlideNum = 1;
+        let speechVoice = null;
+
+        // --- Preload Voices for better humanization ---
+        function loadVoices() {
+            const voices = window.speechSynthesis.getVoices();
+            // Try to find the best 'human' sounding voice available on the device
+            // Priority: specific high-quality names, then general English female
+            speechVoice = voices.find(v => v.name.includes('Google US English')) || 
+                          voices.find(v => v.name.includes('Samantha')) || 
+                          voices.find(v => v.name.includes('Microsoft Zira')) || 
+                          voices.find(v => v.lang === 'en-US' && v.name.includes('Female')) ||
+                          voices.find(v => v.lang.startsWith('en'));
+        }
+        // Chrome loads voices asynchronously
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+        loadVoices(); // Try immediately in case they are ready
+
+        // --- Slide Navigation Engine ---
+        function nextSlide(targetNum) {
+            const currentSlide = document.getElementById(`slide${currentSlideNum}`);
+            const nextSlideEl = document.getElementById(`slide${targetNum}`);
+
+            if (!currentSlide || !nextSlideEl) return;
+
+            // Animate current out
+            currentSlide.classList.remove('active');
+            currentSlide.classList.add('prev');
+
+            // Prepare next slide
+            nextSlideEl.classList.remove('next', 'prev');
+            // Slight delay for smooth CSS transition
+            setTimeout(() => {
+                nextSlideEl.classList.add('active');
+            }, 50);
+
+            currentSlideNum = targetNum;
+
+            if (targetNum === 4) {
+                setTimeout(launchFinaleConfetti, 800);
+            }
+             // Stop audio if moving away from Slide 3
+             if (currentSlideNum !== 3) {
+                window.speechSynthesis.cancel();
+            }
+        }
+
+        // --- Slide 1 Action ---
+        function openGift() {
+            const btn = document.getElementById('gift-btn');
+            const msg = document.getElementById('welcome-msg');
+            
+            btn.style.transform = 'scale(0.8) translateY(-50px)';
+            btn.style.opacity = '0.3';
+            
+            msg.style.opacity = '1';
+            msg.style.transform = 'translateY(0)';
+            msg.style.pointerEvents = 'all';
+
+            if (navigator.vibrate) navigator.vibrate(40);
+        }
+
+        // --- Slide 3 Audio (Humanized Text-to-Speech) ---
+        function playVoiceMessage() {
+            const text = "It's been 1.5 years since we met. We played table tennis together. I know I'm not good in communication, and what my mouth says, that also I don't know sometimes. But at the end, I sorry for some or few mistakes. And wish you the best day of life.";
+            
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Stop any current speech
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                // Use the preloaded better voice if available
+                if (speechVoice) utterance.voice = speechVoice;
+                
+                // Tuning for more natural sound
+                utterance.rate = 0.9;  // Slightly slower than default robot speed
+                utterance.pitch = 1.05; // tiny bit higher often sounds clearer
+
+                // UI Updates
+                const soundWave = document.getElementById('sound-wave');
+                const playIcon = document.getElementById('play-icon');
+                const playText = document.getElementById('play-text');
+
+                utterance.onstart = () => {
+                    soundWave.style.opacity = '1';
+                    playIcon.textContent = '⏹';
+                    playText.textContent = 'Playing...';
+                };
+
+                utterance.onend = () => {
+                    soundWave.style.opacity = '0.3';
+                    playIcon.textContent = '▶';
+                    playText.textContent = 'Play Again';
+                };
+
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Device does not support voice messages.");
+            }
+        }
+
+        // --- Slide 4 Finale ---
+        function launchFinaleConfetti() {
+            const duration = 3000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 6,
+                    angle: 60,
+                    spread: 70,
+                    origin: { x: 0 },
+                    colors: ['#ff9a9e', '#fad0c4', '#ffffff']
+                });
+                confetti({
+                    particleCount: 6,
+                    angle: 120,
+                    spread: 70,
+                    origin: { x: 1 },
+                    colors: ['#a18cd1', '#fbc2eb', '#ffffff']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+    </script>
+</body>
+</html>
